@@ -451,85 +451,85 @@ public class NodeProvisioner {
             return additionalPlannedCapacity;
         }
 
-        /**
-         * The time series average number of items in the queue requiring this {@link #getLabel()}.
-         */
-        public float getQueueLengthLatest() {
-            return stat.queueLength.getLatest(TIME_SCALE);
-        }
-
-        /**
-         * The time series average planned capacity for this {@link #getLabel()}.
-         */
-        public float getPlannedCapacityLatest() {
-            return plannedCapacitiesEMA.getLatest(TIME_SCALE);
-        }
-
-        /**
-         * The time series average number of idle executors for this {@link #getLabel()}
-         * @deprecated use {@link #getAvailableExecutorsLatest()}
-         */
-        @Deprecated
-        public float getIdleLatest() {
-            return getAvailableExecutorsLatest();
-        }
-
-        /**
-         * The time series average total number of executors for this {@link #getLabel()}
-         * @deprecated use {@link #getOnlineExecutorsLatest()}
-         */
-        @Deprecated
-        public float getTotalLatest() {
-            return getOnlineExecutorsLatest();
-        }
-
-        /**
-         * The time series average number of defined executors for this {@link #getLabel()}
-         * @since 1.607
-         */
-        public float getDefinedExecutorsLatest() {
-            return stat.definedExecutors.getLatest(TIME_SCALE);
-        }
-
-        /**
-         * The time series average number of online executors for this {@link #getLabel()}
-         * @since 1.607
-         */
-        public float getOnlineExecutorsLatest() {
-            return stat.onlineExecutors.getLatest(TIME_SCALE);
-        }
-
-        /**
-         * The time series average number of connecting executors for this {@link #getLabel()}
-         * @since 1.607
-         */
-        public float getConnectingExecutorsLatest() {
-            return stat.connectingExecutors.getLatest(TIME_SCALE);
-        }
-
-        /**
-         * The time series average number of busy executors for this {@link #getLabel()}
-         * @since 1.607
-         */
-        public float getBusyExecutorsLatest() {
-            return stat.busyExecutors.getLatest(TIME_SCALE);
-        }
-
-        /**
-         * The time series average number of idle executors for this {@link #getLabel()}
-         * @since 1.607
-         */
-        public float getIdleExecutorsLatest() {
-            return stat.idleExecutors.getLatest(TIME_SCALE);
-        }
-
-        /**
-         * The time series average number of available executors for this {@link #getLabel()}
-         * @since 1.607
-         */
-        public float getAvailableExecutorsLatest() {
-            return stat.availableExecutors.getLatest(TIME_SCALE);
-        }
+//        /**
+//         * The time series average number of items in the queue requiring this {@link #getLabel()}.
+//         */
+//        public float getQueueLengthLatest() {
+//            return stat.queueLength.getLatest(TIME_SCALE);
+//        }
+//
+//        /**
+//         * The time series average planned capacity for this {@link #getLabel()}.
+//         */
+//        public float getPlannedCapacityLatest() {
+//            return plannedCapacitiesEMA.getLatest(TIME_SCALE);
+//        }
+//
+//        /**
+//         * The time series average number of idle executors for this {@link #getLabel()}
+//         * @deprecated use {@link #getAvailableExecutorsLatest()}
+//         */
+//        @Deprecated
+//        public float getIdleLatest() {
+//            return getAvailableExecutorsLatest();
+//        }
+//
+//        /**
+//         * The time series average total number of executors for this {@link #getLabel()}
+//         * @deprecated use {@link #getOnlineExecutorsLatest()}
+//         */
+//        @Deprecated
+//        public float getTotalLatest() {
+//            return getOnlineExecutorsLatest();
+//        }
+//
+//        /**
+//         * The time series average number of defined executors for this {@link #getLabel()}
+//         * @since 1.607
+//         */
+//        public float getDefinedExecutorsLatest() {
+//            return stat.definedExecutors.getLatest(TIME_SCALE);
+//        }
+//
+//        /**
+//         * The time series average number of online executors for this {@link #getLabel()}
+//         * @since 1.607
+//         */
+//        public float getOnlineExecutorsLatest() {
+//            return stat.onlineExecutors.getLatest(TIME_SCALE);
+//        }
+//
+//        /**
+//         * The time series average number of connecting executors for this {@link #getLabel()}
+//         * @since 1.607
+//         */
+//        public float getConnectingExecutorsLatest() {
+//            return stat.connectingExecutors.getLatest(TIME_SCALE);
+//        }
+//
+//        /**
+//         * The time series average number of busy executors for this {@link #getLabel()}
+//         * @since 1.607
+//         */
+//        public float getBusyExecutorsLatest() {
+//            return stat.busyExecutors.getLatest(TIME_SCALE);
+//        }
+//
+//        /**
+//         * The time series average number of idle executors for this {@link #getLabel()}
+//         * @since 1.607
+//         */
+//        public float getIdleExecutorsLatest() {
+//            return stat.idleExecutors.getLatest(TIME_SCALE);
+//        }
+//
+//        /**
+//         * The time series average number of available executors for this {@link #getLabel()}
+//         * @since 1.607
+//         */
+//        public float getAvailableExecutorsLatest() {
+//            return stat.availableExecutors.getLatest(TIME_SCALE);
+//        }
 
         /**
          * If a {@link hudson.slaves.NodeProvisioner.Strategy} takes some provisioning action, it should record
@@ -643,35 +643,54 @@ public class NodeProvisioner {
             boolean needSomeWhenNoneAtAll = (snapshot.getAvailableExecutors() + snapshot.getConnectingExecutors() == 0)
                     && (snapshot.getOnlineExecutors() + state.getPlannedCapacitySnapshot() + state.getAdditionalPlannedCapacity() == 0)
                     && (snapshot.getQueueLength() > 0);
-            float available = Math.max(snapshot.getAvailableExecutors(), state.getAvailableExecutorsLatest());
+//            float available = Math.max(snapshot.getAvailableExecutors(), state.getAvailableExecutorsLatest());
+            float available = snapshot.getAvailableExecutors();
             if (available < MARGIN || needSomeWhenNoneAtAll) {
                 // make sure the system is fully utilized before attempting any new launch.
 
                 // this is the amount of work left to be done
-                float qlen = Math.min(state.getQueueLengthLatest(), snapshot.getQueueLength());
+//                float qlen = Math.min(state.getQueueLengthLatest(), snapshot.getQueueLength());
+                float qlen = snapshot.getQueueLength();
 
-                float connectingCapacity = Math.min(state.getConnectingExecutorsLatest(), snapshot.getConnectingExecutors());
+//                float connectingCapacity = Math.min(state.getConnectingExecutorsLatest(), snapshot.getConnectingExecutors());
+                float connectingCapacity = snapshot.getConnectingExecutors();
 
                 // ... and this is the additional executors we've already provisioned.
-                float plannedCapacity = Math.max(state.getPlannedCapacityLatest(), state.getPlannedCapacitySnapshot())
-                        + state.getAdditionalPlannedCapacity();
+                float planned = state.getPlannedCapacitySnapshot();
+                float additional = state.getAdditionalPlannedCapacity();
+                float plannedCapacity = planned + additional;
+//                floatplannedCapacity = state.getPlannedCapacitySnapshot()
+//                        + state.getAdditionalPlannedCapacity();
+//                float plannedCapacity = Math.max(state.getPlannedCapacityLatest(), state.getPlannedCapacitySnapshot())
+//                        + state.getAdditionalPlannedCapacity();
 
-                float excessWorkload = qlen - plannedCapacity - connectingCapacity;
+//                float excessWorkload = qlen - plannedCapacity - connectingCapacity;
+                // Both plannedCapacity and connectingCapacity just count pending capacity. Should just use one.
+                float excessWorkload = qlen - plannedCapacity;
                 if (needSomeWhenNoneAtAll && excessWorkload < 1) {
                     // in this specific exceptional case we should just provision right now
                     // the exponential smoothing will delay the build unnecessarily
                     excessWorkload = 1;
                 }
                 float m = calcThresholdMargin(state.getTotalSnapshot());
+                LOGGER.log(Level.FINE, "Excess workload {0,number,#.###} detected. "
+                                + "(planned capacity={1,number,#.###},planned={8,number,#.###},additional={9,number,#.###},connecting capacity={7,number,#.###},"
+                                + "Qlen={2,number,#.###},available={3,number,#.###}&{4,number,integer},"
+                                + "online={5,number,integer},m={6,number,#.###})",
+                        new Object[]{
+                                excessWorkload, plannedCapacity, qlen, available, snapshot.getAvailableExecutors(),
+                                snapshot.getOnlineExecutors(), m , snapshot.getConnectingExecutors(),
+                                planned, additional
+                        });
                 if (excessWorkload > 1 - m) {// and there's more work to do...
-                    LOGGER.log(Level.FINE, "Excess workload {0,number,#.###} detected. "
-                                    + "(planned capacity={1,number,#.###},connecting capacity={7,number,#.###},"
-                                    + "Qlen={2,number,#.###},available={3,number,#.###}&{4,number,integer},"
-                                    + "online={5,number,integer},m={6,number,#.###})",
-                            new Object[]{
-                                    excessWorkload, plannedCapacity, qlen, available, snapshot.getAvailableExecutors(),
-                                    snapshot.getOnlineExecutors(), m , snapshot.getConnectingExecutors()
-                            });
+//                    LOGGER.log(Level.FINE, "Excess workload {0,number,#.###} detected. "
+//                                    + "(planned capacity={1,number,#.###},connecting capacity={7,number,#.###},"
+//                                    + "Qlen={2,number,#.###},available={3,number,#.###}&{4,number,integer},"
+//                                    + "online={5,number,integer},m={6,number,#.###})",
+//                            new Object[]{
+//                                    excessWorkload, plannedCapacity, qlen, available, snapshot.getAvailableExecutors(),
+//                                    snapshot.getOnlineExecutors(), m , snapshot.getConnectingExecutors()
+//                            });
 
                     CLOUD:
                     for (Cloud c : Jenkins.getInstance().clouds) {
@@ -689,7 +708,9 @@ public class NodeProvisioner {
                             // so the threshold here is 1-MARGIN, and hence floor(excessWorkload+MARGIN) is needed to
                             // handle this.
 
-                            int workloadToProvision = (int) Math.round(Math.floor(excessWorkload + m));
+//                            int workloadToProvision = (int) Math.round(Math.floor(excessWorkload + m));
+                            int workloadToProvision = (int) (excessWorkload);
+                            LOGGER.log(Level.INFO, "workloadToProvision: {0}", workloadToProvision);
 
                             for (CloudProvisioningListener cl : CloudProvisioningListener.all()) {
                                 if (cl.canProvision(c, state.getLabel(), workloadToProvision) != null) {
@@ -761,11 +782,12 @@ public class NodeProvisioner {
          * </ul>
          */
         private float calcThresholdMargin(int totalSnapshot) {
-            float f = (float) (MARGIN + (MARGIN0 - MARGIN) * Math.pow(MARGIN_DECAY, totalSnapshot));
+//            float f = (float) (MARGIN + (MARGIN0 - MARGIN) * Math.pow(MARGIN_DECAY, totalSnapshot));
             // defensively ensure that the threshold margin is in (0,1)
-            f = Math.max(f, 0);
-            f = Math.min(f, 1);
-            return f;
+//            f = Math.max(f, 0);
+//            f = Math.min(f, 1);
+//            return f;
+            return 1;
         }
     }
 
